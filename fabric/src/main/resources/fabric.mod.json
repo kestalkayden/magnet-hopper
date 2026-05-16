@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "magnethopper",
+  "version": "${version}",
+  "name": "Magnet Hopper",
+  "description": "A hopper that pulls dropped items in a radius before depositing into the container below.",
+  "authors": [
+    "Kestalkayden"
+  ],
+  "contact": {
+    "homepage": "https://github.com/kestalkayden/magnet-hopper",
+    "sources": "https://github.com/kestalkayden/magnet-hopper"
+  },
+  "license": "CC0-1.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.kestalkayden.magnethopper.MagnetHopperFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "fabric-api": "*",
+    "minecraft": ">=26.1 <26.2",
+    "java": ">=25"
+  }
+}
