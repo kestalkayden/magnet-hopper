@@ -39,8 +39,8 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
 
     /** Ticks between pull-scans when actively finding items. */
     private static final int PULL_COOLDOWN = 8;
-    /** Max pull cooldown after backoff (6.4s of idle). */
-    private static final int MAX_PULL_COOLDOWN = 128;
+    /** Max pull cooldown after backoff (3.2s — worst-case latency before idle hopper notices new items). */
+    private static final int MAX_PULL_COOLDOWN = 64;
     /** Ticks between push attempts (matches vanilla hopper cadence). */
     private static final int PUSH_COOLDOWN = 8;
 
