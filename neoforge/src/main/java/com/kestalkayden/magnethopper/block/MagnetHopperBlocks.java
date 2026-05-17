@@ -1,7 +1,5 @@
 package com.kestalkayden.magnethopper.block;
 
-import java.util.function.Supplier;
-
 import com.kestalkayden.magnethopper.MagnetHopperNeoForge;
 
 import net.minecraft.core.registries.Registries;
@@ -9,6 +7,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -34,15 +33,27 @@ public final class MagnetHopperBlocks {
     private MagnetHopperBlocks() {}
 
     private static DeferredBlock<MagnetHopperBlock> registerBlock(String name, MagnetTier tier) {
-        ResourceKey<LootTable> lootKey = ResourceKey.create(Registries.LOOT_TABLE,
-            Identifier.fromNamespaceAndPath(MagnetHopperNeoForge.MOD_ID, "blocks/" + name));
-        return BLOCKS.register(name, () -> new MagnetHopperBlock(tier,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.HOPPER)
-                .overrideLootTable(Optional.of(lootKey))
-                .mapColor(MapColor.METAL)));
+        // Use the Function<Identifier, …> overload so we can construct the block's ResourceKey
+        // and call setId() on the Properties — required by BlockBehaviour as of 26.x to
+        // bootstrap the implicit loot-table reference. Without it, effectiveDrops NPEs at construction.
+        return BLOCKS.register(name, id -> {
+            ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, id);
+            ResourceKey<LootTable> lootKey = ResourceKey.create(Registries.LOOT_TABLE,
+                Identifier.fromNamespaceAndPath(MagnetHopperNeoForge.MOD_ID, "blocks/" + name));
+            return new MagnetHopperBlock(tier,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.HOPPER)
+                    .setId(blockKey)
+                    .overrideLootTable(Optional.of(lootKey))
+                    .mapColor(MapColor.METAL));
+        });
     }
 
-    private static DeferredItem<BlockItem> registerBlockItem(String name, Supplier<MagnetHopperBlock> blockSupplier) {
-        return ITEMS.register(name, () -> new BlockItem(blockSupplier.get(), new Item.Properties().useBlockDescriptionPrefix()));
+    private static DeferredItem<BlockItem> registerBlockItem(String name, DeferredBlock<MagnetHopperBlock> blockHolder) {
+        // Same story for items: Item.Properties also requires setId() for stack-default identification.
+        return ITEMS.register(name, id -> {
+            ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, id);
+            return new BlockItem(blockHolder.get(),
+                new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
+        });
     }
 }
