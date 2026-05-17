@@ -1,9 +1,9 @@
 {
   "variants": {
     "facing=down":  { "model": "magnethopper:block/industrial_magnet_hopper" },
-    "facing=north": { "model": "magnethopper:block/industrial_magnet_hopper", "y": 0   },
-    "facing=south": { "model": "magnethopper:block/industrial_magnet_hopper", "y": 180 },
-    "facing=east":  { "model": "magnethopper:block/industrial_magnet_hopper", "y": 90  },
-    "facing=west":  { "model": "magnethopper:block/industrial_magnet_hopper", "y": 270 }
+    "facing=north": { "model": "magnethopper:block/industrial_magnet_hopper_side" },
+    "facing=south": { "model": "magnethopper:block/industrial_magnet_hopper_side", "y": 180 },
+    "facing=east":  { "model": "magnethopper:block/industrial_magnet_hopper_side", "y": 90  },
+    "facing=west":  { "model": "magnethopper:block/industrial_magnet_hopper_side", "y": 270 }
   }
 }

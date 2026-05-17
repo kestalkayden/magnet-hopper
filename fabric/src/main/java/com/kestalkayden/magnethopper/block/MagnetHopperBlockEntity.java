@@ -164,7 +164,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
         if (pushCooldown > 0) {
             pushCooldown--;
         } else {
-            changed |= pushToContainerBelow(level, pos);
+            changed |= pushToContainer(level, pos, state);
             pushCooldown = PUSH_COOLDOWN;
         }
 
@@ -204,15 +204,18 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
         return anyInserted;
     }
 
-    private boolean pushToContainerBelow(ServerLevel level, BlockPos pos) {
-        Container dest = HopperBlockEntity.getContainerAt(level, pos.below());
+    private boolean pushToContainer(ServerLevel level, BlockPos pos, BlockState state) {
+        Direction facing = state.getValue(MagnetHopperBlock.FACING);
+        Container dest = HopperBlockEntity.getContainerAt(level, pos.relative(facing));
         if (dest == null) return false;
 
+        // The destination's "input side" is the face the hopper points INTO (opposite of facing).
+        Direction insertSide = facing.getOpposite();
         for (int i = 0; i < getContainerSize(); i++) {
             ItemStack slotStack = getItem(i);
             if (slotStack.isEmpty()) continue;
             ItemStack one = slotStack.copyWithCount(1);
-            ItemStack remainder = HopperBlockEntity.addItem(this, dest, one, Direction.UP);
+            ItemStack remainder = HopperBlockEntity.addItem(this, dest, one, insertSide);
             if (remainder.isEmpty()) {
                 slotStack.shrink(1);
                 return true;

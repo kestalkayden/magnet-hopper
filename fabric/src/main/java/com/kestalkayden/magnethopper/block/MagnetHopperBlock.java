@@ -2,6 +2,8 @@ package com.kestalkayden.magnethopper.block;
 
 import com.mojang.serialization.MapCodec;
 
+import java.util.Map;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -36,12 +38,20 @@ public class MagnetHopperBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING_HOPPER;
     public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
-    private static final VoxelShape INSIDE     = box(2, 11, 2, 14, 16, 14);
-    private static final VoxelShape OUTER_CUT  = Shapes.join(Shapes.block(), INSIDE, BooleanOp.ONLY_FIRST);
-    private static final VoxelShape DOWN_SPOUT = Shapes.or(
-        box(6, 4, 6, 10, 11, 10),
-        box(4, 0, 4, 12, 4, 12));
-    private static final VoxelShape SHAPE = Shapes.or(OUTER_CUT, DOWN_SPOUT);
+    private static final VoxelShape INSIDE   = box(2, 11, 2, 14, 16, 14);   // bowl opening at top
+    private static final VoxelShape BOWL_RIM = Shapes.join(
+        box(0, 10, 0, 16, 16, 16),   // bowl region (floor + walls + opening)
+        INSIDE,
+        BooleanOp.ONLY_FIRST);
+    private static final VoxelShape FUNNEL   = box(4, 4, 4, 12, 10, 12);     // central funnel taper
+
+    // Spout box per facing. Same as vanilla hopper.
+    private static final Map<Direction, VoxelShape> SHAPES = Map.of(
+        Direction.DOWN,  Shapes.or(BOWL_RIM, FUNNEL, box(6, 0, 6, 10, 4, 10)),
+        Direction.NORTH, Shapes.or(BOWL_RIM, FUNNEL, box(6, 4, 0, 10, 8, 4)),
+        Direction.SOUTH, Shapes.or(BOWL_RIM, FUNNEL, box(6, 4, 12, 10, 8, 16)),
+        Direction.EAST,  Shapes.or(BOWL_RIM, FUNNEL, box(12, 4, 6, 16, 8, 10)),
+        Direction.WEST,  Shapes.or(BOWL_RIM, FUNNEL, box(0, 4, 6, 4, 8, 10)));
 
     private final MagnetTier tier;
 
@@ -69,8 +79,10 @@ public class MagnetHopperBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction facing = context.getClickedFace().getOpposite();
-        if (facing == Direction.UP) facing = Direction.DOWN;
+        // Mirror vanilla hopper: clicking top or bottom of a neighbor → face DOWN.
+        // Clicking a side → face in that horizontal direction (so the spout points into the clicked block).
+        Direction clicked = context.getClickedFace().getOpposite();
+        Direction facing = clicked.getAxis() == Direction.Axis.Y ? Direction.DOWN : clicked;
         boolean enabled = !context.getLevel().hasNeighborSignal(context.getClickedPos());
         return defaultBlockState().setValue(FACING, facing).setValue(ENABLED, enabled);
     }
@@ -86,7 +98,7 @@ public class MagnetHopperBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return SHAPE;
+        return SHAPES.get(state.getValue(FACING));
     }
 
     @Override
