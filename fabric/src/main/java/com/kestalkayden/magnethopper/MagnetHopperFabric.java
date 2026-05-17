@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.kestalkayden.magnethopper.block.MagnetHopperBlockEntities;
 import com.kestalkayden.magnethopper.block.MagnetHopperBlocks;
+import com.kestalkayden.magnethopper.component.MagnetHopperComponents;
 import com.kestalkayden.magnethopper.menu.MagnetHopperMenus;
 
 import net.fabricmc.api.ModInitializer;
@@ -23,6 +24,7 @@ public class MagnetHopperFabric implements ModInitializer {
         MagnetHopperBlocks.register();
         MagnetHopperBlockEntities.register();
         MagnetHopperMenus.register();
+        MagnetHopperComponents.register();
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(output -> {
             output.insertAfter(Items.HOPPER,

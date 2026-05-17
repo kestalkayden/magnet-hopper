@@ -1,5 +1,7 @@
 package com.kestalkayden.magnethopper.block;
 
+import com.kestalkayden.magnethopper.component.MagnetHopperComponents;
+import com.kestalkayden.magnethopper.component.MagnetHopperConfig;
 import com.kestalkayden.magnethopper.menu.MagnetHopperMenu;
 
 import net.minecraft.core.BlockPos;
@@ -230,12 +232,24 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
         components.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.items));
+
+        NonNullList<ItemStack> filterItems = NonNullList.withSize(FILTER_SIZE, ItemStack.EMPTY);
+        for (int i = 0; i < FILTER_SIZE; i++) filterItems.set(i, filterContainer.getItem(i));
+        components.set(MagnetHopperComponents.CONFIG(),
+            new MagnetHopperConfig(ItemContainerContents.fromItems(filterItems), whitelist, magnetEnabled));
     }
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter componentGetter) {
         super.applyImplicitComponents(componentGetter);
         componentGetter.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.items);
+
+        MagnetHopperConfig config = componentGetter.getOrDefault(MagnetHopperComponents.CONFIG(), MagnetHopperConfig.DEFAULT);
+        NonNullList<ItemStack> filterItems = NonNullList.withSize(FILTER_SIZE, ItemStack.EMPTY);
+        config.filters().copyInto(filterItems);
+        for (int i = 0; i < FILTER_SIZE; i++) filterContainer.setItem(i, filterItems.get(i));
+        this.whitelist = config.whitelist();
+        this.magnetEnabled = config.magnetEnabled();
     }
 
     /**

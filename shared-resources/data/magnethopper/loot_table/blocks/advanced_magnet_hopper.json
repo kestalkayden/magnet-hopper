@@ -12,7 +12,7 @@
           "functions": [
             {
               "function": "minecraft:copy_components",
-              "include": ["minecraft:custom_name", "minecraft:container"],
+              "include": ["minecraft:custom_name", "minecraft:container", "magnethopper:config"],
               "source": "block_entity"
             }
           ],

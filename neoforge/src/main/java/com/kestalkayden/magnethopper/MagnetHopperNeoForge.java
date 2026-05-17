@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.kestalkayden.magnethopper.block.MagnetHopperBlockEntities;
 import com.kestalkayden.magnethopper.block.MagnetHopperBlocks;
 import com.kestalkayden.magnethopper.client.MagnetHopperScreen;
+import com.kestalkayden.magnethopper.component.MagnetHopperComponents;
 import com.kestalkayden.magnethopper.menu.MagnetHopperMenus;
 
 import net.minecraft.world.item.CreativeModeTabs;
@@ -30,6 +31,7 @@ public class MagnetHopperNeoForge {
         MagnetHopperBlocks.ITEMS.register(modBus);
         MagnetHopperBlockEntities.BES.register(modBus);
         MagnetHopperMenus.MENUS.register(modBus);
+        MagnetHopperComponents.COMPONENTS.register(modBus);
 
         modBus.addListener(MagnetHopperNeoForge::onBuildCreativeTabs);
 
