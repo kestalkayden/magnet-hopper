@@ -10,6 +10,8 @@ import com.kestalkayden.magnethopper.menu.MagnetHopperMenus;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Items;
 
@@ -25,6 +27,12 @@ public class MagnetHopperFabric implements ModInitializer {
         MagnetHopperBlockEntities.register();
         MagnetHopperMenus.register();
         MagnetHopperComponents.register();
+
+        // Expose our inventory to Fabric's item-transfer pipe API. ContainerStorage.of() respects
+        // WorldlyContainer (our filter), so pipes can't push/pull blacklisted items in either direction.
+        ItemStorage.SIDED.registerForBlockEntity(
+            (be, dir) -> ContainerStorage.of(be, dir),
+            MagnetHopperBlockEntities.MAGNET_HOPPER_BE);
 
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(output -> {
             output.insertAfter(Items.HOPPER,

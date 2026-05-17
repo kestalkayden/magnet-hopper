@@ -95,10 +95,10 @@ public class MagnetHopperScreen extends AbstractContainerScreen<MagnetHopperMenu
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         super.extractLabels(g, mouseX, mouseY);
         // Pass shadow=false so the dark labels don't get a darker drop-shadow ghost behind them
-        g.text(font, "Storage", 8, LABEL_STORAGE_Y, LABEL_COLOR, false);
-        g.text(font, "Filter",  8, LABEL_FILTER_Y,  LABEL_COLOR, false);
+        g.text(font, Component.translatable("gui.magnethopper.storage").getString(), 8, LABEL_STORAGE_Y, LABEL_COLOR, false);
+        g.text(font, Component.translatable("gui.magnethopper.filter").getString(),  8, LABEL_FILTER_Y,  LABEL_COLOR, false);
         // Static labels above each button — pairs with the short action verb on the button itself
-        g.text(font, "Magnet", BTN_X, LABEL_STORAGE_Y, LABEL_COLOR, false);
+        g.text(font, Component.translatable("gui.magnethopper.magnet").getString(), BTN_X, LABEL_STORAGE_Y, LABEL_COLOR, false);
     }
 
     @Override

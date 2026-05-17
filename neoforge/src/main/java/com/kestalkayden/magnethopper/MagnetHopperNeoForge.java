@@ -16,8 +16,12 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 
 @Mod(MagnetHopperNeoForge.MOD_ID)
 public class MagnetHopperNeoForge {
@@ -34,10 +38,23 @@ public class MagnetHopperNeoForge {
         MagnetHopperComponents.COMPONENTS.register(modBus);
 
         modBus.addListener(MagnetHopperNeoForge::onBuildCreativeTabs);
+        modBus.addListener(MagnetHopperNeoForge::onRegisterCapabilities);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             modBus.addListener(MagnetHopperNeoForge::onRegisterMenuScreens);
         }
+    }
+
+    /** Expose our inventory to pipe mods (Pipez, EnderIO, AE2, etc.) via NeoForge's Item
+     *  block capability. WorldlyContainerWrapper respects WorldlyContainer (our filter), so
+     *  pipes can't push/pull blacklisted items in either direction. */
+    private static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+            Capabilities.Item.BLOCK,
+            MagnetHopperBlockEntities.MAGNET_HOPPER_BE,
+            (be, side) -> side != null
+                ? new WorldlyContainerWrapper(be, side)
+                : VanillaContainerWrapper.of(be));
     }
 
     private static void onBuildCreativeTabs(BuildCreativeModeTabContentsEvent event) {

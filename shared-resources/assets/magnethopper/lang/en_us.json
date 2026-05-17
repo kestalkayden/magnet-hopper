@@ -5,5 +5,8 @@
   "gui.magnethopper.whitelist": "Whitelist",
   "gui.magnethopper.blacklist": "Blacklist",
   "gui.magnethopper.enabled": "Enabled",
-  "gui.magnethopper.disabled": "Disabled"
+  "gui.magnethopper.disabled": "Disabled",
+  "gui.magnethopper.storage": "Storage",
+  "gui.magnethopper.filter": "Filter",
+  "gui.magnethopper.magnet": "Magnet"
 }
