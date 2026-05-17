@@ -233,6 +233,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
         for (int i = 0; i < getContainerSize(); i++) {
             ItemStack slotStack = getItem(i);
             if (slotStack.isEmpty()) continue;
+            if (!passesFilter(slotStack)) continue;  // filter applies to push-out too
             ItemStack one = slotStack.copyWithCount(1);
             ItemStack remainder = HopperBlockEntity.addItem(this, dest, one, insertSide);
             if (remainder.isEmpty()) {
@@ -283,7 +284,9 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
 
     @Override
     public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction) {
-        return true;
+        // External hoppers pulling FROM us respect the filter — same conceptual rule as
+        // automation push-in. Filter is symmetric across all automation paths; only UI bypasses.
+        return passesFilter(stack);
     }
 
     /**
