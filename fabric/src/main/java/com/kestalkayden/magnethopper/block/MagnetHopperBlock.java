@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -105,14 +104,8 @@ public class MagnetHopperBlock extends BaseEntityBlock {
         return new MagnetHopperBlockEntity(pos, state);
     }
 
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MagnetHopperBlockEntity be) {
-            // Spill main storage into the world (filter slots are not lootable — they're config, not contents).
-            Containers.dropContents(level, pos, be);
-        }
-        return super.playerWillDestroy(level, pos, state, player);
-    }
+    // Main inventory and filter config are preserved in the dropped block item via data
+    // components (minecraft:container + magnethopper:config). No need to spill here.
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {

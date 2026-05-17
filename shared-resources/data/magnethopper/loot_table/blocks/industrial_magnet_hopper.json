@@ -12,7 +12,7 @@
           "functions": [
             {
               "function": "minecraft:copy_components",
-              "include": ["minecraft:custom_name"],
+              "include": ["minecraft:custom_name", "minecraft:container"],
               "source": "block_entity"
             }
           ],
