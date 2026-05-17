@@ -68,9 +68,9 @@ jobs:
       - name: publish fabric
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          modrinth-id: MAGNET_HOPPER_MODRINTH_SLUG  # TODO: replace with actual Modrinth slug once project is created
+          modrinth-id: magnet-hopper
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: MAGNET_HOPPER_CURSEFORGE_ID  # TODO: replace with numeric CurseForge project ID once created
+          curseforge-id: 1546015
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ github.ref_name }}
@@ -87,9 +87,9 @@ jobs:
       - name: publish neoforge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          modrinth-id: MAGNET_HOPPER_MODRINTH_SLUG  # TODO: replace with actual Modrinth slug
+          modrinth-id: magnet-hopper
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: MAGNET_HOPPER_CURSEFORGE_ID  # TODO: replace with numeric CurseForge project ID
+          curseforge-id: 1546015
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ github.ref_name }}
