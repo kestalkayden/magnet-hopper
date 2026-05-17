@@ -43,10 +43,7 @@ Dev clients: `./gradlew :fabric:runClient` or `./gradlew :neoforge:runClient`.
 
 ## Known limitations (v0.1)
 
-- **Inventory not preserved on break**: items currently in the internal storage spill into the world when the block is broken by a player (you can pick them up). They don't carry over inside the item NBT for replacement.
-- **Filter slots not preserved on break**: filter configuration is lost when the block is broken. Re-set after replacing.
 - **GUI uses procedural rendering**: no custom PNG texture for the menu background — looks minimal but functional. Texture polish planned for v0.2.
-- **Block facing**: all magnet hoppers face down only; the side-facing variant of vanilla hopper geometry isn't yet supported.
 
 ## License
 
