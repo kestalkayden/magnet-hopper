@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,10 +29,13 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
-public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
+public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
 
     public static final int CONTAINER_SIZE = 5;
     public static final int FILTER_SIZE = 5;
+
+    /** All main storage slot indices — used by WorldlyContainer.getSlotsForFace. */
+    private static final int[] ALL_MAIN_SLOTS = new int[]{0, 1, 2, 3, 4};
 
     /** Ticks between pull-scans when actively finding items. */
     private static final int PULL_COOLDOWN = 8;
@@ -263,6 +267,23 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
         for (int i = 0; i < FILTER_SIZE; i++) filterContainer.setItem(i, filterItems.get(i));
         this.whitelist = config.whitelist();
         this.magnetEnabled = config.magnetEnabled();
+    }
+
+    // --- WorldlyContainer (filter applies to automation inserts; UI is unfiltered) ---
+
+    @Override
+    public int[] getSlotsForFace(Direction side) {
+        return ALL_MAIN_SLOTS;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, Direction direction) {
+        return passesFilter(stack);
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction) {
+        return true;
     }
 
     /**
