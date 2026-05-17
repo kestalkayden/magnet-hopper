@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,8 +33,10 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
     public static final int CONTAINER_SIZE = 5;
     public static final int FILTER_SIZE = 5;
 
-    /** Ticks between pull-scans. */
+    /** Ticks between pull-scans when actively finding items. */
     private static final int PULL_COOLDOWN = 8;
+    /** Max pull cooldown after backoff (6.4s of idle). */
+    private static final int MAX_PULL_COOLDOWN = 128;
     /** Ticks between push attempts (matches vanilla hopper cadence). */
     private static final int PUSH_COOLDOWN = 8;
 
@@ -57,6 +60,8 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
 
     private int pullCooldown = 0;
     private int pushCooldown = 0;
+    /** Consecutive empty pull scans, exponentiates the pull cooldown up to MAX_PULL_COOLDOWN. */
+    private int emptyPullScans = 0;
 
     public MagnetHopperBlockEntity(BlockPos pos, BlockState state) {
         super(MagnetHopperBlockEntities.MAGNET_HOPPER_BE, pos, state);
@@ -155,18 +160,26 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
             pullCooldown--;
         } else {
             // Vanilla hopper "suck" is ALWAYS active — magnet hopper is a strict superset of vanilla hopper.
-            changed |= suckFromContainerAbove(level, pos);
+            boolean pulled = suckFromContainerAbove(level, pos);
             // The magnet add-on (3-block radius item-entity pull) is gated by the UI toggle.
             if (magnetEnabled) {
-                changed |= pullNearbyItems(level, pos);
+                pulled |= pullNearbyItems(level, pos);
             }
-            pullCooldown = PULL_COOLDOWN;
+            changed |= pulled;
+            // Adaptive backoff: idle hoppers tick less often. Resets on any successful pull or push.
+            if (pulled) emptyPullScans = 0;
+            else if (emptyPullScans < 4) emptyPullScans++;
+            pullCooldown = Math.min(PULL_COOLDOWN << emptyPullScans, MAX_PULL_COOLDOWN);
         }
 
         if (pushCooldown > 0) {
             pushCooldown--;
         } else {
-            changed |= pushToContainer(level, pos, state);
+            boolean pushed = pushToContainer(level, pos, state);
+            if (pushed) {
+                changed = true;
+                emptyPullScans = 0;  // freed up inventory, wake pull loop back to baseline
+            }
             pushCooldown = PUSH_COOLDOWN;
         }
 
@@ -177,7 +190,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
 
     /** Vanilla hopper behavior: pull one item from a container directly above, respecting the filter. */
     private boolean suckFromContainerAbove(ServerLevel level, BlockPos pos) {
-        Container source = HopperBlockEntity.getContainerAt(level, pos.above());
+        Container source = findContainerAt(level, pos.above());
         if (source == null) return false;
         for (int i = 0; i < source.getContainerSize(); i++) {
             ItemStack stack = source.getItem(i);
@@ -208,7 +221,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
 
     private boolean pushToContainer(ServerLevel level, BlockPos pos, BlockState state) {
         Direction facing = state.getValue(MagnetHopperBlock.FACING);
-        Container dest = HopperBlockEntity.getContainerAt(level, pos.relative(facing));
+        Container dest = findContainerAt(level, pos.relative(facing));
         if (dest == null) return false;
 
         // The destination's "input side" is the face the hopper points INTO (opposite of facing).
@@ -250,6 +263,19 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity {
         for (int i = 0; i < FILTER_SIZE; i++) filterContainer.setItem(i, filterItems.get(i));
         this.whitelist = config.whitelist();
         this.magnetEnabled = config.magnetEnabled();
+    }
+
+    /**
+     * Returns a container at the given pos — checks block entities first, then falls back to
+     * any Container entity at that position (hopper minecart, chest minecart, etc.).
+     */
+    private static Container findContainerAt(net.minecraft.world.level.Level level, BlockPos pos) {
+        Container blockContainer = HopperBlockEntity.getContainerAt(level, pos);
+        if (blockContainer != null) return blockContainer;
+        AABB box = new AABB(pos);
+        java.util.List<Entity> entities = level.getEntities((Entity) null, box,
+            e -> e instanceof Container && e.isAlive());
+        return entities.isEmpty() ? null : (Container) entities.get(0);
     }
 
     /**
