@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "M": "magnethopper:magnet_hopper",
+    "G": "minecraft:gold_ingot"
+  },
+  "pattern": [
+    " G ",
+    "GMG",
+    " G "
+  ],
+  "result": {
+    "id": "magnethopper:advanced_magnet_hopper"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "H": "minecraft:hopper",
+    "C": "minecraft:copper_ingot"
+  },
+  "pattern": [
+    " C ",
+    "CHC",
+    " C "
+  ],
+  "result": {
+    "id": "magnethopper:magnet_hopper"
+  }
+}

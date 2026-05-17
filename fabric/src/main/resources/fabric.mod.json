@@ -12,10 +12,14 @@
     "sources": "https://github.com/kestalkayden/magnet-hopper"
   },
   "license": "CC0-1.0",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       "com.kestalkayden.magnethopper.MagnetHopperFabric"
+    ],
+    "client": [
+      "com.kestalkayden.magnethopper.client.MagnetHopperClient"
     ]
   },
   "depends": {

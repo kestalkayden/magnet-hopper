@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": "magnethopper:advanced_magnet_hopper",
+    "D": "minecraft:diamond"
+  },
+  "pattern": [
+    " D ",
+    "DAD",
+    " D "
+  ],
+  "result": {
+    "id": "magnethopper:industrial_magnet_hopper"
+  }
+}

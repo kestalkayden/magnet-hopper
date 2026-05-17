@@ -1,2 +1,9 @@
 {
+  "block.magnethopper.magnet_hopper": "Magnet Hopper",
+  "block.magnethopper.advanced_magnet_hopper": "Advanced Magnet Hopper",
+  "block.magnethopper.industrial_magnet_hopper": "Industrial Magnet Hopper",
+  "gui.magnethopper.whitelist": "Whitelist",
+  "gui.magnethopper.blacklist": "Blacklist",
+  "gui.magnethopper.enabled": "Enabled",
+  "gui.magnethopper.disabled": "Disabled"
 }

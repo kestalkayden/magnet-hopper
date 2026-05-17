@@ -12,6 +12,7 @@ A hopper that pulls dropped items in a radius before depositing into the contain
 '''
 authors="Kestalkayden"
 displayURL="https://github.com/kestalkayden/magnet-hopper"
+logoFile="icon.png"
 
 [[dependencies.magnethopper]]
 modId="neoforge"

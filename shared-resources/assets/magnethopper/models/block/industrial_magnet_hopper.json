@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/hopper",
+  "textures": {
+    "particle": "magnethopper:block/industrial_magnet_hopper_outside",
+    "inside":   "minecraft:block/hopper_inside",
+    "side":     "magnethopper:block/industrial_magnet_hopper_outside",
+    "top":      "minecraft:block/diamond_block"
+  }
+}

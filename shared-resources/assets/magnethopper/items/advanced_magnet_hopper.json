@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "magnethopper:item/advanced_magnet_hopper"
+  }
+}
