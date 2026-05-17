@@ -76,9 +76,11 @@ public class MagnetHopperMenu extends AbstractContainerMenu {
         for (int i = 0; i < MAIN_SLOTS; i++) {
             addSlot(new Slot(mainContainer, i, ROW_X_START + i * 18, ROW_STORAGE_Y));
         }
-        // Filter row (5 slots), indices 5-9
+        // Filter row (5 slots), indices 5-9. Ghost slots — mayPlace/mayPickup false so vanilla
+        // input handlers (SWAP, drag, double-click) don't actually transfer items. The custom
+        // clicked() override below handles PICKUP/QUICK_MOVE to ghost-set or clear.
         for (int i = 0; i < FILTER_SLOTS; i++) {
-            addSlot(new Slot(filterContainer, i, ROW_X_START + i * 18, ROW_FILTER_Y));
+            addSlot(new FilterSlot(filterContainer, i, ROW_X_START + i * 18, ROW_FILTER_Y));
         }
         // Player inventory (3 rows × 9), indices 10-36
         for (int row = 0; row < 3; row++) {
@@ -129,6 +131,15 @@ public class MagnetHopperMenu extends AbstractContainerMenu {
             return;
         }
         super.clicked(slotId, dragType, input, player);
+    }
+
+    /** Ghost slot: vanilla input handlers (SWAP, drag, double-click, throw) do nothing. */
+    private static class FilterSlot extends Slot {
+        FilterSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+        @Override public boolean mayPlace(ItemStack stack) { return false; }
+        @Override public boolean mayPickup(Player player)  { return false; }
     }
 
     @Override
