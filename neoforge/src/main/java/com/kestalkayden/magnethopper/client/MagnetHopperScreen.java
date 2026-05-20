@@ -24,10 +24,12 @@ public class MagnetHopperScreen extends AbstractContainerScreen<MagnetHopperMenu
     // Color palette
     private static final int BG_GRAY      = 0xFFC6C6C6;
     private static final int BG_BORDER    = 0xFF555555;
-    private static final int SLOT_BORDER  = 0xFF373737;
-    private static final int SLOT_INNER   = 0xFF8B8B8B;
-    private static final int FILTER_INNER = 0xFF7B8FB0;
-    private static final int LABEL_COLOR  = 0xFF404040;
+    // Vanilla-style chiseled inset bevel — dark top/left, white bottom/right, flat interior.
+    private static final int SLOT_BEVEL_DARK  = 0xFF373737;
+    private static final int SLOT_BEVEL_LIGHT = 0xFFFFFFFF;
+    private static final int SLOT_INNER       = 0xFF8B8B8B;
+    private static final int FILTER_INNER     = 0xFF7B8FB0;
+    private static final int LABEL_COLOR      = 0xFF404040;
 
     // Right-side buttons (stacked) — aligned vertically with their slot rows.
     private static final int BTN_W = 50;
@@ -86,9 +88,20 @@ public class MagnetHopperScreen extends AbstractContainerScreen<MagnetHopperMenu
             int sy = y + slot.y - 1;
             boolean isFilterSlot = i >= MagnetHopperMenu.FILTER_SLOT_START
                                 && i <  MagnetHopperMenu.FILTER_SLOT_END;
-            g.fill(sx, sy, sx + 18, sy + 18, SLOT_BORDER);
-            g.fill(sx + 1, sy + 1, sx + 17, sy + 17, isFilterSlot ? FILTER_INNER : SLOT_INNER);
+            drawSlotWell(g, sx, sy, 18, 18, isFilterSlot ? FILTER_INNER : SLOT_INNER);
         }
+    }
+
+    /** Chiseled inset slot — top+left edges dark (panel shadow falling into the recess),
+     *  bottom+right edges white (recess catching light), flat interior. Matches vanilla container
+     *  slot styling. Top/bottom rows span full width so the TR corner reads as dark and the BL
+     *  corner reads as light (vanilla inset look). */
+    private static void drawSlotWell(GuiGraphicsExtractor g, int wx, int wy, int ww, int wh, int innerColor) {
+        g.fill(wx, wy, wx + ww, wy + 1, SLOT_BEVEL_DARK);
+        g.fill(wx, wy + wh - 1, wx + ww, wy + wh, SLOT_BEVEL_LIGHT);
+        g.fill(wx, wy + 1, wx + 1, wy + wh - 1, SLOT_BEVEL_DARK);
+        g.fill(wx + ww - 1, wy + 1, wx + ww, wy + wh - 1, SLOT_BEVEL_LIGHT);
+        g.fill(wx + 1, wy + 1, wx + ww - 1, wy + wh - 1, innerColor);
     }
 
     @Override
