@@ -1,14 +1,12 @@
 package com.kestalkayden.magnethopper.client;
 
 import com.kestalkayden.magnethopper.MagnetHopperNeoForge;
-import com.kestalkayden.magnethopper.block.MagnetHopperBlock;
 import com.kestalkayden.magnethopper.block.MagnetHopperBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -19,10 +17,16 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 
 /**
  * Client-side placement preview — see Fabric counterpart for full docs.
+ *
+ * MC 26.2 migration: MultiBufferSource was removed. Custom geometry is now
+ * submitted via SubmitCustomGeometryEvent (fired between particle submission
+ * and opaque renders), which exposes a SubmitNodeCollector. Call
+ * collector.submitCustomGeometry(poseStack, renderType, (pose, vc) -> { ... })
+ * to batch line geometry without managing buffer flushing manually.
  */
 @EventBusSubscriber(modid = MagnetHopperNeoForge.MOD_ID, value = Dist.CLIENT)
 public final class MagnetHopperFieldRenderer {
@@ -42,7 +46,7 @@ public final class MagnetHopperFieldRenderer {
     private MagnetHopperFieldRenderer() {}
 
     @SubscribeEvent
-    public static void onAfterTranslucentFeatures(RenderLevelStageEvent.AfterTranslucentFeatures event) {
+    public static void onSubmitCustomGeometry(SubmitCustomGeometryEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
@@ -53,7 +57,7 @@ public final class MagnetHopperFieldRenderer {
         if (!(hit instanceof BlockHitResult bhr) || bhr.getType() != HitResult.Type.BLOCK) return;
 
         BlockPos placePos = bhr.getBlockPos().relative(bhr.getDirection());
-        render(event, mc, placePos, radius);
+        render(event, mc.level, placePos, radius);
     }
 
     private static int getHeldRadius(Player player) {
@@ -69,22 +73,22 @@ public final class MagnetHopperFieldRenderer {
         return 0;
     }
 
-    private static void render(RenderLevelStageEvent.AfterTranslucentFeatures event,
-                                Minecraft mc, BlockPos center, int radius) {
+    private static void render(SubmitCustomGeometryEvent event,
+                               ClientLevel level, BlockPos center, int radius) {
         Vec3 cam = event.getLevelRenderState().cameraRenderState.pos;
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         poseStack.translate(-cam.x, -cam.y, -cam.z);
 
-        MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(RenderTypes.lines());
-        PoseStack.Pose pose = poseStack.last();
-
-        renderCubeOutline(vc, pose, center, radius);
-        renderSurfaceContour(vc, pose, mc.level, center, radius);
+        // MC 26.2: submit custom geometry through the SubmitNodeCollector.
+        // submitCustomGeometry snapshots the current pose and provides a
+        // Pose + VertexConsumer for the requested render type in the callback.
+        event.getSubmitNodeCollector().submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vc) -> {
+            renderCubeOutline(vc, pose, center, radius);
+            renderSurfaceContour(vc, pose, level, center, radius);
+        });
 
         poseStack.popPose();
-        bufferSource.endBatch(RenderTypes.lines());
     }
 
     private static void renderCubeOutline(VertexConsumer vc, PoseStack.Pose pose, BlockPos center, int radius) {
