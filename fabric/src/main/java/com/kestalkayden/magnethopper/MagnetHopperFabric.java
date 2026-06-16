@@ -28,6 +28,11 @@ public class MagnetHopperFabric implements ModInitializer {
         MagnetHopperMenus.register();
         MagnetHopperComponents.register();
 
+        // Bind loader-agnostic refs so shared :common code reaches the registered objects.
+        MagnetHopperRefs.MAGNET_HOPPER_BE = () -> MagnetHopperBlockEntities.MAGNET_HOPPER_BE;
+        MagnetHopperRefs.MAGNET_HOPPER_MENU = () -> MagnetHopperMenus.MAGNET_HOPPER_MENU;
+        MagnetHopperRefs.CONFIG = MagnetHopperComponents::CONFIG;
+
         // Expose our inventory to Fabric's item-transfer pipe API. ContainerStorage.of() respects
         // WorldlyContainer (our filter), so pipes can't push/pull blacklisted items in either direction.
         ItemStorage.SIDED.registerForBlockEntity(

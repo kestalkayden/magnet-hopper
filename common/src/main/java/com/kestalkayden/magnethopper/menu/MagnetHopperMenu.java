@@ -1,5 +1,6 @@
 package com.kestalkayden.magnethopper.menu;
 
+import com.kestalkayden.magnethopper.MagnetHopperRefs;
 import com.kestalkayden.magnethopper.block.MagnetHopperBlockEntity;
 
 import net.minecraft.world.Container;
@@ -67,7 +68,7 @@ public class MagnetHopperMenu extends AbstractContainerMenu {
 
     private MagnetHopperMenu(int containerId, Inventory playerInv,
                              Container mainContainer, Container filterContainer, ContainerData data) {
-        super(MagnetHopperMenus.MAGNET_HOPPER_MENU, containerId);
+        super(MagnetHopperRefs.MAGNET_HOPPER_MENU.get(), containerId);
         this.mainContainer = mainContainer;
         this.filterContainer = filterContainer;
         this.data = data;

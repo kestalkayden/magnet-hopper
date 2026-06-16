@@ -37,6 +37,11 @@ public class MagnetHopperNeoForge {
         MagnetHopperMenus.MENUS.register(modBus);
         MagnetHopperComponents.COMPONENTS.register(modBus);
 
+        // Bind loader-agnostic refs (DeferredHolders resolve lazily, after registration fires).
+        MagnetHopperRefs.MAGNET_HOPPER_BE = MagnetHopperBlockEntities.MAGNET_HOPPER_BE_HOLDER::get;
+        MagnetHopperRefs.MAGNET_HOPPER_MENU = MagnetHopperMenus.MAGNET_HOPPER_MENU_HOLDER::get;
+        MagnetHopperRefs.CONFIG = MagnetHopperComponents::CONFIG;
+
         modBus.addListener(MagnetHopperNeoForge::onBuildCreativeTabs);
         modBus.addListener(MagnetHopperNeoForge::onRegisterCapabilities);
 

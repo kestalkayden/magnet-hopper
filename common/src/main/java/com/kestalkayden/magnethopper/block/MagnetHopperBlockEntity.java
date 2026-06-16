@@ -1,6 +1,6 @@
 package com.kestalkayden.magnethopper.block;
 
-import com.kestalkayden.magnethopper.component.MagnetHopperComponents;
+import com.kestalkayden.magnethopper.MagnetHopperRefs;
 import com.kestalkayden.magnethopper.component.MagnetHopperConfig;
 import com.kestalkayden.magnethopper.menu.MagnetHopperMenu;
 
@@ -68,7 +68,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
     private int emptyPullScans = 0;
 
     public MagnetHopperBlockEntity(BlockPos pos, BlockState state) {
-        super(MagnetHopperBlockEntities.MAGNET_HOPPER_BE, pos, state);
+        super(MagnetHopperRefs.MAGNET_HOPPER_BE.get(), pos, state);
     }
 
     public boolean isWhitelist() { return whitelist; }
@@ -253,7 +253,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
 
         NonNullList<ItemStack> filterItems = NonNullList.withSize(FILTER_SIZE, ItemStack.EMPTY);
         for (int i = 0; i < FILTER_SIZE; i++) filterItems.set(i, filterContainer.getItem(i));
-        components.set(MagnetHopperComponents.CONFIG(),
+        components.set(MagnetHopperRefs.CONFIG.get(),
             new MagnetHopperConfig(ItemContainerContents.fromItems(filterItems), whitelist, magnetEnabled));
     }
 
@@ -262,7 +262,7 @@ public class MagnetHopperBlockEntity extends RandomizableContainerBlockEntity im
         super.applyImplicitComponents(componentGetter);
         componentGetter.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.items);
 
-        MagnetHopperConfig config = componentGetter.getOrDefault(MagnetHopperComponents.CONFIG(), MagnetHopperConfig.DEFAULT);
+        MagnetHopperConfig config = componentGetter.getOrDefault(MagnetHopperRefs.CONFIG.get(), MagnetHopperConfig.DEFAULT);
         NonNullList<ItemStack> filterItems = NonNullList.withSize(FILTER_SIZE, ItemStack.EMPTY);
         config.filters().copyInto(filterItems);
         for (int i = 0; i < FILTER_SIZE; i++) filterContainer.setItem(i, filterItems.get(i));

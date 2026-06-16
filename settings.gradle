@@ -18,5 +18,6 @@ plugins {
 
 rootProject.name = 'magnethopper'
 
+include 'common'
 include 'fabric'
 include 'neoforge'
