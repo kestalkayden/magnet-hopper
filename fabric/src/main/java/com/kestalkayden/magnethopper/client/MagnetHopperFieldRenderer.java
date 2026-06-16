@@ -80,14 +80,16 @@ public final class MagnetHopperFieldRenderer {
         poseStack.pushPose();
         poseStack.translate(-cam.x, -cam.y, -cam.z);
 
-        VertexConsumer vc = ctx.bufferSource().getBuffer(RenderTypes.lines());
-        PoseStack.Pose pose = poseStack.last();
-
-        renderCubeOutline(vc, pose, center, radius);
-        renderSurfaceContour(vc, pose, level, center, radius);
+        // MC 26.2 render overhaul: custom world geometry is submitted through the
+        // SubmitNodeCollector rather than drawn into an immediate-mode buffer source.
+        // submitCustomGeometry snapshots the current pose and hands the callback a
+        // Pose + VertexConsumer for the lines render type, batching/flushing internally.
+        ctx.submitNodeCollector().submitCustomGeometry(poseStack, RenderTypes.lines(), (pose, vc) -> {
+            renderCubeOutline(vc, pose, center, radius);
+            renderSurfaceContour(vc, pose, level, center, radius);
+        });
 
         poseStack.popPose();
-        ctx.bufferSource().endBatch(RenderTypes.lines());
     }
 
     private static void renderCubeOutline(VertexConsumer vc, PoseStack.Pose pose, BlockPos center, int radius) {
